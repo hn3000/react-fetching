@@ -1,4 +1,4 @@
-import { FetcherBasic } from './fetcher-basic';
+import { FetcherBasic, IFetcherRenderProps } from './fetcher-basic';
 
 import * as React from 'react';
 
@@ -6,40 +6,44 @@ import * as React from 'react';
 export interface IFetcherSimpleProps<T> {
   url: string;
   fetchOptions?: RequestInit;
-  render(data?: T, error?: any, loading?: boolean): JSX.Element;
+  renderComp: React.ComponentType<IFetcherRenderProps<T>>
 }
-export interface IFetcherSimpleState<T> {
+export interface IFetcherCache<T> {
   url: string;
-  fetcher: () => Promise<T>;
+  fetch: () => Promise<T>;
 }
-export class FetcherSimple<T> extends React.Component<IFetcherSimpleProps<T>, IFetcherSimpleState<T>> {
+export class FetcherSimple<T> extends React.Component<IFetcherSimpleProps<T>> {
 
+  private _cache: IFetcherCache<T>;
   constructor(props: IFetcherSimpleProps<T>, context: any) {
     super(props, context);
-    this.state = this.createFetcher();
-  }
-
-  componentDidUpdate() {
-    this.maybeCreateFetcher();
+    this._cache = this.createFetcher();
   }
 
   maybeCreateFetcher() {
-    if (this.state.url !== this.props.url) {
-      this.setState(this.createFetcher);
+    if (this._cache.url !== this.props.url) {
+      this._cache = this.createFetcher();
     }
   }
 
-  createFetcher(): IFetcherSimpleState<T> {
-    let { url, fetchOptions = { credentials: 'include' } as RequestInit } = this.props;
-    let fetcher = () => fetch(url, fetchOptions).then(unpackResponse) as Promise<T>;
-    return { url, fetcher };
+  createFetcher(): IFetcherCache<T> {
+    let {
+      url,
+      fetchOptions = { credentials: 'include' } as RequestInit
+    } = this.props;
+
+    return {
+      url,
+      fetch: () => fetch(url, fetchOptions).then(unpackResponse) as Promise<T>
+    };
   }
 
   render() {
-    let { render } = this.props;
-    let { fetcher } = this.state;
+    this.maybeCreateFetcher();
+    let { renderComp } = this.props;
+    let { fetch } = this._cache;
 
-    return <FetcherBasic render={render} fetch={fetcher}/>
+    return <FetcherBasic {...{renderComp, fetch}} />
   }
 }
 

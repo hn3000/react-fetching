@@ -1,5 +1,5 @@
 
-console.log('pasring main');
+console.log('main');
 
 import { FetcherSimple } from '../src/fetcher-simple';
 console.log('fetcher loaded', FetcherSimple);
@@ -9,30 +9,47 @@ import * as React from 'react';
 console.log('react loaded', React);
 
 import * as ReactDOM from 'react-dom';
-import { FetcherBasic } from '../src';
+import { FetcherBasic, IFetcherRenderProps } from '../src';
 
 
 console.log(React, ReactDOM, FetcherSimple);
 
-ReactDOM.render(
-  <div>
-    <FetcherSimple url="http://localhost" render={renderFun} />
-    <hr />
-    <FetcherBasic fetch={delay(2000, {}, null)} render={renderFun} />
-    <hr />
-    <FetcherBasic fetch={delay(2000, null, "some error")} render={renderFun} />
-  </div>,
-  document.getElementsByTagName('div')[0]
-);
+var count = 0;
 
+function run() {
+  ReactDOM.render(
+    <div>
+      <div><button onClick={prevPage}>&lt;</button><button onClick={nextPage}>&gt;</button></div>
+      <hr />
+      <FetcherSimple url={`http://localhost?q=${count}`} renderComp={RenderComp} />
+      <hr />
+      <FetcherBasic fetch={delay(2000, { count }, null)} renderComp={RenderComp} />
+      <hr />
+      <FetcherBasic fetch={delay(2000, null, `some error (${count})`)} renderComp={RenderComp} />
+    </div>,
+    document.getElementsByTagName('div')[0]
+  );
+}
 
-function renderFun(data?: any, error?: any, loading = false) {
-  //console.log(`data: ${data}, error: ${error}, loading: ${loading}`);
+run();
+
+function prevPage() {
+  count -= 1;
+  run();
+}
+function nextPage() {
+  count += 1;
+  run();
+}
+
+function RenderComp(props: IFetcherRenderProps<any>): JSX.Element {
+  let { data, error, status } = props;
+  console.log(`data: ${data}, error: ${error}, status: ${JSON.stringify(status)}`);
   return (
     <div>
-      <div>{`data: ${null != data}`}</div>
-      <div>{`error: ${null != error}`}</div>
-      <div>{`loading: ${!!loading}`}</div>
+      <div>{`data: ${JSON.stringify(data)}`}</div>
+      <div>{`error: ${error}`}</div>
+      <div>{`status: ${status}`}</div>
     </div>
   );
 }
