@@ -2,6 +2,7 @@ import { FetcherBasic, IFetcherRenderProps } from './fetcher-basic';
 
 import * as React from 'react';
 
+export { FetchStatus } from './fetcher-basic';
 
 export interface IFetcherSimpleProps<T> {
   url: string;
