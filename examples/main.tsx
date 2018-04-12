@@ -23,9 +23,9 @@ function run() {
       <hr />
       <FetcherSimple url={`http://localhost?q=${count}`} renderComp={RenderComp} />
       <hr />
-      <FetcherBasic fetch={delay(2000, { count }, null)} renderComp={RenderComp} />
+      <FetcherBasic fetch={delay(400, { count }, null)} renderComp={RenderComp} />
       <hr />
-      <FetcherBasic fetch={delay(2000, null, `some error (${count})`)} renderComp={RenderComp} />
+      <FetcherBasic fetch={delay(600, null, `some error (${count})`)} renderComp={RenderComp} />
     </div>,
     document.getElementsByTagName('div')[0]
   );
