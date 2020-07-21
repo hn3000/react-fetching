@@ -7,7 +7,7 @@ export { FetchStatus } from './fetcher-basic';
 export interface IFetcherSimpleProps<T> {
   url: string;
   fetchOptions?: RequestInit;
-  renderComp: React.ComponentType<IFetcherRenderProps<T>>
+  render: React.ComponentType<IFetcherRenderProps<T>>
 }
 export interface IFetcherCache<T> {
   url: string;
@@ -41,10 +41,10 @@ export class FetcherSimple<T> extends React.Component<IFetcherSimpleProps<T>> {
 
   render() {
     this.maybeCreateFetcher();
-    let { renderComp } = this.props;
+    let { render } = this.props;
     let { fetch } = this._cache;
 
-    return <FetcherBasic {...{renderComp, fetch}} />
+    return <FetcherBasic {...{render, fetch}} />
   }
 }
 

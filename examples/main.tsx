@@ -17,15 +17,16 @@ console.log(React, ReactDOM, FetcherSimple);
 var count = 0;
 
 function run() {
+
   ReactDOM.render(
     <div>
       <div><button onClick={prevPage}>&lt;</button><button onClick={nextPage}>&gt;</button></div>
       <hr />
-      <FetcherSimple url={`http://localhost?q=${count}`} renderComp={RenderComp} />
+      <FetcherSimple url={`http://localhost?q=${count}`} render={RenderComp} />
       <hr />
-      <FetcherBasic fetch={delay(400, { count }, null)} renderComp={RenderComp} />
+      <FetcherBasic fetch={delay(400, { count }, null)} render={RenderComp} />
       <hr />
-      <FetcherBasic fetch={delay(600, null, `some error (${count})`)} renderComp={RenderComp} />
+      <FetcherBasic fetch={delay(600, null, `some error (${count})`)} render={RenderComp} />
     </div>,
     document.getElementsByTagName('div')[0]
   );

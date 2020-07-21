@@ -6,6 +6,8 @@ export interface IFetcherRenderProps<T> {
   status: FetchStatus;
   data?: T;
   error?: any;
+  start?: number;
+  end?: number;
 }
 
 export interface fetcher<T> {
@@ -20,7 +22,7 @@ export enum FetchStatus  {
 
 export interface IFetcherBasicProps<T> {
   fetch(): Promise<T>;
-  renderComp?: React.ComponentType<IFetcherRenderProps<T>>
+  render?: React.ComponentType<IFetcherRenderProps<T>>
 }
 
 
@@ -29,6 +31,8 @@ export interface IFetcherBasicState<T> {
   error?: any;
   promise?: Promise<T> ;
   status: FetchStatus;
+  start?: number;
+  end?: number;
   fetch: () => Promise<T>;
 }
 
@@ -54,27 +58,44 @@ export class FetcherBasic<T> extends React.Component<IFetcherBasicProps<T>, IFet
     if (fetch !== this.props.fetch || promise == null) {
       fetch = this.props.fetch;
       const promise = fetch();
+      const start = Date.now();
       promise.then(data => {
         if (this.state.promise === promise) {
-          this.setState({data, error: undefined, status: FetchStatus.RESULT });
+          this.setState({
+            data,
+            error: undefined,
+            status: FetchStatus.RESULT,
+            end: Date.now()
+          });
         }
       }).then(null, error => {
         if (this.state.promise === promise) {
-          this.setState({error, data: undefined, status: FetchStatus.ERROR });
+          this.setState({
+            error,
+            data: undefined,
+            status: FetchStatus.ERROR,
+            end: Date.now()
+          });
         }
       });
-      return { ...oldState, promise, status: FetchStatus.FETCHING, fetch};
+      return {
+        ...oldState,
+        promise,
+        status: FetchStatus.FETCHING,
+        fetch,
+        start
+      };
     }
     return oldState;
   }
 
   render() {
-    let { data, error, status } = this.state;
-    let { renderComp } = this.props;
+    let { data, error, status, start, end } = this.state;
+    let { render } = this.props;
 
-    if (null != renderComp) {
-      const Comp = renderComp;
-      return <Comp {...{status, data, error}} />;
+    if (null != render) {
+      const Comp = render;
+      return <Comp {...{status, data, error, start, end}} />;
     }
 
     return null;

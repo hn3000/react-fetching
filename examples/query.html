@@ -1,0 +1,66 @@
+
+<div>
+  <textarea cols="50" rows="30">
+
+  </textarea>
+</div>
+<div>
+    <a href="" id="link"></a>
+</div>
+<script>
+var rqpre = /[?&]([^=&]*)(?:=([^&]*))?/g;
+function parseSearchParams(search) {
+    var result = {};
+    if (search && search != '') {
+        var match;
+        while (match = rqpre.exec(search)) {
+            var name = match[1];
+            var value = decodeURIComponent(match[2]);
+            if (!result[name]) {
+                result[name] = [value];
+            }
+            else {
+                var v = result[name];
+                v.push(value);
+            }
+        }
+    }
+    return result;
+}
+
+function unparseSearchParams(params) {
+  var items = [];
+  var keys = Object.keys(params);
+  for (var k of keys) {
+    let p = Array.isArray(params[k]) ? params[k] : [ params[k] ];
+    items = items.concat(p.map(x => `${k}=${encodeURIComponent(''+x)}`));
+  }
+  if (items.length) {
+    return `?${items.join('&')}`;
+  }
+  return '';
+}
+
+document.onreadystatechange = function(x) {
+  if (x.target.readyState == 'interactive') {
+    const ta = document.getElementsByTagName('textarea')[0];
+
+    ta.onchange = ta.onkeyup = updateLink;
+    let params = parseSearchParams(location.search);
+    ta.textContent = JSON.stringify(params, null, 2);
+    updateLink();
+  }
+}
+
+function updateLink() {
+  const ta = document.getElementsByTagName('textarea')[0];
+  const link = document.getElementById('link');
+  const text = ta.value;
+  const params = JSON.parse(text);
+  console.log(params);
+  const search = unparseSearchParams(params);
+  link.href = search;
+  link.textContent = search;
+}
+
+</script>
